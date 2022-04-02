@@ -1,5 +1,6 @@
 import { useRef, useState } from "react";
 import {
+  IonAlert,
   IonApp,
   IonCol,
   IonContent,
@@ -39,6 +40,7 @@ setupIonicReact();
 
 const App: React.FC = () => {
   const [calculatedBMI, setCalculatedBMI] = useState<number>();
+  const [error, setError] = useState<string>();
 
   const weightInputRefs = useRef<HTMLIonInputElement>(null);
   const heightInputRefs = useRef<HTMLIonInputElement>(null);
@@ -47,7 +49,13 @@ const App: React.FC = () => {
     const enteredWeight = weightInputRefs.current!.value;
     const enteredHeight = heightInputRefs.current!.value;
 
-    if (!enteredHeight || !enteredWeight) {
+    if (
+      !enteredHeight ||
+      !enteredWeight ||
+      +enteredHeight <= 0 ||
+      +enteredWeight <= 0
+    ) {
+      setError("Invalid Input");
       return;
     }
 
@@ -60,39 +68,53 @@ const App: React.FC = () => {
     heightInputRefs.current!.value = "";
   };
 
+  const clearError = () => {
+    setError("");
+  };
+
   return (
-    <IonApp>
-      <IonHeader>
-        <IonToolbar>
-          <IonTitle>BMI Calculator</IonTitle>
-        </IonToolbar>
-      </IonHeader>
+    <>
+      <IonAlert
+        isOpen={!!error}
+        message={error}
+        buttons={[{ text: "Okay", handler: clearError }]}
+      ></IonAlert>
+      <IonApp>
+        <IonHeader>
+          <IonToolbar color="primary">
+            <IonTitle>BMI Calculator</IonTitle>
+          </IonToolbar>
+        </IonHeader>
 
-      <IonContent className="ion-padding">
-        <IonGrid>
-          <IonRow>
-            <IonCol>
-              <IonItem>
-                <IonLabel position="floating">Your Height</IonLabel>
-                <IonInput ref={heightInputRefs}></IonInput>
-              </IonItem>
-            </IonCol>
-          </IonRow>
+        <IonContent className="ion-padding">
+          <IonGrid>
+            <IonRow>
+              <IonCol>
+                <IonItem>
+                  <IonLabel position="floating">Your Height</IonLabel>
+                  <IonInput type="number" ref={heightInputRefs}></IonInput>
+                </IonItem>
+              </IonCol>
+            </IonRow>
 
-          <IonRow>
-            <IonCol>
-              <IonItem>
-                <IonLabel position="floating">Your Weight</IonLabel>
-                <IonInput ref={weightInputRefs}></IonInput>
-              </IonItem>
-            </IonCol>
-          </IonRow>
-          <BMIControls calculateBMI={calculateBMI} resetInputs={resetInputs} />
+            <IonRow>
+              <IonCol>
+                <IonItem>
+                  <IonLabel position="floating">Your Weight</IonLabel>
+                  <IonInput type="number" ref={weightInputRefs}></IonInput>
+                </IonItem>
+              </IonCol>
+            </IonRow>
+            <BMIControls
+              calculateBMI={calculateBMI}
+              resetInputs={resetInputs}
+            />
 
-          {calculatedBMI && <BMIResult calculatedBMI={calculatedBMI} />}
-        </IonGrid>
-      </IonContent>
-    </IonApp>
+            {calculatedBMI && <BMIResult calculatedBMI={calculatedBMI} />}
+          </IonGrid>
+        </IonContent>
+      </IonApp>
+    </>
   );
 };
 
