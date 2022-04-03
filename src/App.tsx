@@ -35,6 +35,7 @@ import "@ionic/react/css/display.css";
 import "./theme/variables.css";
 import BMIControls from "./components/BMIControls";
 import BMIResult from "./components/BMIResult";
+import InputControl from "./components/InputControl";
 
 setupIonicReact();
 
@@ -88,6 +89,12 @@ const App: React.FC = () => {
 
         <IonContent className="ion-padding">
           <IonGrid>
+            <IonRow>
+              <IonCol>
+                <InputControl selectedOption="mkg" />
+              </IonCol>
+            </IonRow>
+
             <IonRow>
               <IonCol>
                 <IonItem>
