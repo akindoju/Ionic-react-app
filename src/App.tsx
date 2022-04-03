@@ -42,6 +42,7 @@ setupIonicReact();
 const App: React.FC = () => {
   const [calculatedBMI, setCalculatedBMI] = useState<number>();
   const [error, setError] = useState<string>();
+  const [calcUnit, setCalcUnit] = useState<"mkg" | "ftlbs">("mkg");
 
   const weightInputRefs = useRef<HTMLIonInputElement>(null);
   const heightInputRefs = useRef<HTMLIonInputElement>(null);
@@ -60,7 +61,14 @@ const App: React.FC = () => {
       return;
     }
 
-    const bmi = +enteredWeight / (+enteredHeight * +enteredHeight);
+    const weightConversionFactor = calcUnit === "ftlbs" ? 2.2 : 1;
+    const heightConversionFactor = calcUnit === "ftlbs" ? 3.28 : 1;
+
+    const weight = +enteredWeight / weightConversionFactor;
+    const height = +enteredHeight / heightConversionFactor;
+
+    const bmi = weight / (height * height);
+
     setCalculatedBMI(bmi);
   };
 
@@ -71,6 +79,10 @@ const App: React.FC = () => {
 
   const clearError = () => {
     setError("");
+  };
+
+  const selectCalcUnitHandler = (selectedValue: "mkg" | "ftlbs") => {
+    setCalcUnit(selectedValue);
   };
 
   return (
@@ -91,14 +103,19 @@ const App: React.FC = () => {
           <IonGrid>
             <IonRow>
               <IonCol>
-                <InputControl selectedOption="mkg" />
+                <InputControl
+                  selectedOption={calcUnit}
+                  selectCalcUnitHandler={selectCalcUnitHandler}
+                />
               </IonCol>
             </IonRow>
 
             <IonRow>
               <IonCol>
                 <IonItem>
-                  <IonLabel position="floating">Your Height</IonLabel>
+                  <IonLabel position="floating">
+                    Your Height ({calcUnit === "mkg" ? "meters" : "feet"})
+                  </IonLabel>
                   <IonInput type="number" ref={heightInputRefs}></IonInput>
                 </IonItem>
               </IonCol>
@@ -107,7 +124,9 @@ const App: React.FC = () => {
             <IonRow>
               <IonCol>
                 <IonItem>
-                  <IonLabel position="floating">Your Weight</IonLabel>
+                  <IonLabel position="floating">
+                    Your Weight ({calcUnit === "mkg" ? "kilograms" : "pounds"}){" "}
+                  </IonLabel>
                   <IonInput type="number" ref={weightInputRefs}></IonInput>
                 </IonItem>
               </IonCol>
